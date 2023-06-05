@@ -1,11 +1,15 @@
 const arraySize = 500;
 var canvas;
 var targetInput;
+var target;
+var nextStep;
+var numArray = [];
+var waitUntilNextStep = false;
 function setup() {
   const canvascontainer = document.getElementById('canvascontainer');
 
-  canvas = createCanvas(arraySize, arraySize);
-  canvas.background(255);
+  canvas = createCanvas(arraySize, 500);
+  canvas.background(0);
   canvas.parent(canvascontainer);
   
   const button = document.getElementById('start');
@@ -16,17 +20,6 @@ function setup() {
 }
 
 function validInputCheck() {
-  if (targetInput.value > 500) {
-    targetInput.value = 500;
-  } else if (targetInput.value < 0) {
-    targetInput.value = 0;
-  }
-}
-
-function start() {
-  validInputCheck();
-  const numArray = generateArray();
-  draw_values(numArray);
   var target = targetInput.value;
   if (target === "") {
     target = Math.floor(Math.random() * 500);
@@ -34,17 +27,29 @@ function start() {
   if (typeof(target) ===  'string') {
     target = parseInt(target);
   }
-  console.log(target, typeof(target));
+  if (target > arraySize-1) {
+    target = arraySize - 1;
+  } else if (target < 0) {
+    target = 0;
+  }
+  return target;
+}
+
+function start() {
+  generateArray();
+  draw_values(numArray);
+
+  target = validInputCheck();
+  draw_values(numArray, target, target);
+
   const targetIndex = binarySearch(numArray, target);
-  alert(targetIndex);
+  alert(numArray[targetIndex]);
 }
 
 function binarySearch(numArray, targetnum) {
   var left = 0;
   var right = numArray.length - 1;
-  fill(0,255,0);
   while (left <= right) {
-    visualise(numArray, left, right);
     var middle = Math.floor((left + right) / 2);
     var middlenum = numArray[middle]
     if (middlenum === targetnum) {
@@ -54,32 +59,25 @@ function binarySearch(numArray, targetnum) {
     } else {
       right = middle - 1;
     }
+    waitUntilNextStep = true;
+    
   }
-
-  
-  
-}
-
-function visualise(dataArray, left, right) {
-  canvas.background(255);
-  fill(0,255,0);
-  quad(left, 0, left, arraySize, right, arraySize, right, 0);
-  draw_values(dataArray);
 }
 
 function generateArray() {
-  var numarray = [];
   for (let i = 0; i < arraySize; i++) {
-    numarray.push(i);
+    numArray.push(i);
   }
-  return numarray;
 }
 
-function draw_values(values) {
-  stroke(0);
+function draw_values(values, left, right) {
   values.forEach((value) => {
-    line(value, 0, value, arraySize - value); // x1 y1 x2 y2
+
+    if (value >= left && value <= right) {
+      stroke(0,255,0);
+    } else {
+      stroke(255,255,255);
+    }
+    line(value, arraySize, value, arraySize - value); // x1 y1 x2 y2
   });
 }
-
-
