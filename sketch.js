@@ -1,14 +1,13 @@
-const arraySize = 500;
+const arraySize = 700;
 var canvas;
 var targetInput;
 var target;
 var nextStep;
 var numArray = [];
-var waitUntilNextStep = false;
 function setup() {
   const canvascontainer = document.getElementById('canvascontainer');
 
-  canvas = createCanvas(arraySize, 500);
+  canvas = createCanvas(arraySize, arraySize);
   canvas.background(0);
   canvas.parent(canvascontainer);
   
@@ -22,7 +21,7 @@ function setup() {
 function validInputCheck() {
   var target = targetInput.value;
   if (target === "") {
-    target = Math.floor(Math.random() * 500);
+    target = Math.floor(Math.random() * arraySize);
   }
   if (typeof(target) ===  'string') {
     target = parseInt(target);
@@ -59,7 +58,6 @@ function binarySearch(numArray, targetnum) {
     } else {
       right = middle - 1;
     }
-    waitUntilNextStep = true;
     
   }
 }
