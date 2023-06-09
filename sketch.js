@@ -59,7 +59,6 @@ function binarySearch(numArray, targetnum) {
   var left = 0;
   var right = numArray.length - 1;
   while (left <= right) {
-
     var middle = Math.floor((left + right) / 2);
     var middlenum = numArray[middle]
     draw_values(numArray, left, right);
