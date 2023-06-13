@@ -2,7 +2,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: aquamarine;
+  background-color: #000c18;
+  color: #225588;
 }
 
 canvas {
@@ -13,4 +14,11 @@ canvas {
   margin-left: 10px;
   margin-top: 10px;
   padding: 3px;
+}
+
+#result {
+  margin-left: 10px;
+  margin-top: 10px;
+  padding: 3px;
+  font-family: consolas;
 }

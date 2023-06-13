@@ -1,10 +1,13 @@
 const arraySize = 10**3;
+const repeats = 2**25;
 var canvas;
 var targetInput;
 var target;
 var nextStep;
 var numArray = [];
-var startTimeRecursive, startTimeIterative, endTimeRecursive, endTimeIterative;
+var startTimeRecursive, startTimeIterative, endTimeRecursive, endTimeIterative, startTimeUniform, endTimeUniform;
+var lookup_table = new Array(arraySize);
+lookup_table.fill(0);
 function setup() {
   const canvascontainer = document.getElementById('canvascontainer');
 
@@ -42,30 +45,57 @@ function start() {
   target = validInputCheck();
   //draw_values(numArray, target, target);
   startTimeRecursive = window.performance.now();
-  for (let i = 0; i < 2**25; i++) {
-  var targetIndex = binarySearchRecursive(numArray, target);
+  for (let i = 0; i < repeats; i++) {
+  var targetIndexI = binarySearchRecursive(numArray, target);
   }
   endTimeRecursive = window.performance.now();
   startTimeIterative = window.performance.now();
-  for (let i = 0; i < 2**25; i++) {
-    var targetIndex = binarySearch(numArray, target);
+  for (let i = 0; i < repeats; i++) {
+    var targetIndexR = binarySearchIterative(numArray, target);
   }
   endTimeIterative = window.performance.now();
-  
+  create_lookup_table(arraySize);
+  startTimeUniform = window.performance.now();
+  for (let i = 0; i < repeats; i++) {
+    var targetIndexU = binarySearchUniform(numArray, target);
+  }
+  endTimeUniform = window.performance.now();
+
+  var dtIterative = endTimeIterative - startTimeIterative;
+  var dtRecursive = endTimeRecursive - startTimeRecursive;
+  var dtUniform = endTimeUniform - startTimeUniform;
+  var avgTimeIterative = dtIterative / repeats;
+  var avgTimeRecursive = dtRecursive / repeats;
+  var avgTimeUniform = dtUniform / repeats;
+
   //draw_values(numArray, target, target);
   
   const result = document.getElementById('result');
-  console.log(targetIndex);
-  result.innerHTML = `${targetIndex}<br>
-  Recursive took ${(endTimeRecursive - startTimeRecursive) / 2**25} ms.<br>
-  Iterative took ${(endTimeIterative - startTimeIterative) / 2**25} ms.<br>
-  Iterative is ${((endTimeRecursive - startTimeRecursive) / 2**25)/((endTimeIterative - startTimeIterative) / 2**25)} times faster.`;
+  //console.log(targetIndex);
+  const min = Math.min(avgTimeIterative, avgTimeRecursive, avgTimeUniform);
+  if (avgTimeIterative === min) {
+    var fastest = 'Iterative';
+  } else if (avgTimeRecursive === min) {
+    var fastest = 'Recursive';
+  } else {
+    var fastest = 'Uniform';
+  }
+  result.innerHTML = `${targetIndexI} ${targetIndexR} ${targetIndexU}<br>
+  Recursive took ${avgTimeRecursive} ms.<br>
+  Iterative took ${avgTimeIterative} ms.<br>
+  Uniform took ${avgTimeUniform} ms. <br>
+  Iterative is ${avgTimeRecursive / avgTimeIterative} times faster than recursive.<br>
+  Uniform is ${avgTimeIterative / avgTimeUniform} times faster than uniform.<br>
+  Uniform is ${avgTimeRecursive / avgTimeUniform} times faster than uniform.<br>
+  ${fastest} is the fastest variant.`;
+  
+
 }
 
 
 /* Iteratief */
 
-function binarySearch(numArray, targetnum) {
+function binarySearchIterative(numArray, targetnum) {
   var left = 0;
   var right = numArray.length - 1;
   while (left <= right) {
@@ -100,6 +130,38 @@ function binarySearchRecursive(numArray, target, start = 0, end = numArray.lengt
   return binarySearchRecursive(numArray, target, mid + 1, end);
 }
 
+
+/* Uniform */
+
+function create_lookup_table(n) {
+  let power = 1;
+  let count = 0;
+  while (true) {
+    power = power * 2
+    lookup_table[count] = Math.floor((n + (power >> 1)) / power);
+    if (lookup_table[count] == 0) {
+      break;
+    }
+    count++;
+  }
+}
+
+function binarySearchUniform(numArray, target) {
+  let index = lookup_table[0] - 1;
+  let count = 0;
+  while (lookup_table[count] != 0) {
+    if (target === numArray[index]) {
+      return index
+    } else if (target < numArray[index]) {
+      count++;
+      index -= lookup_table[count]
+    } else {
+      count++;
+      index += lookup_table[count]
+    }
+  }
+  return index;
+}
 
 
 
