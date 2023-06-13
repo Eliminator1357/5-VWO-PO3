@@ -1,14 +1,14 @@
-const arraySize = 700;
+const arraySize = 10**3;
 var canvas;
 var targetInput;
 var target;
 var nextStep;
 var numArray = [];
-
+var startTimeRecursive, startTimeIterative, endTimeRecursive, endTimeIterative;
 function setup() {
   const canvascontainer = document.getElementById('canvascontainer');
 
-  canvas = createCanvas(arraySize, arraySize);
+  canvas = createCanvas(500, 500);
   canvas.background(0);
   canvas.parent(canvascontainer);
 
@@ -37,23 +37,33 @@ function validInputCheck() {
 
 function start() {
   generateArray();
-  draw_values(numArray);
+  //draw_values(numArray);
 
   target = validInputCheck();
-  draw_values(numArray, target, target);
-
-  const targetIndex = binarySearch(numArray, target);
-  //alert(numArray[targetIndex]);
-  draw_values(numArray, target, target);
-
+  //draw_values(numArray, target, target);
+  startTimeRecursive = window.performance.now();
+  for (let i = 0; i < 2**25; i++) {
+  var targetIndex = binarySearchRecursive(numArray, target);
+  }
+  endTimeRecursive = window.performance.now();
+  startTimeIterative = window.performance.now();
+  for (let i = 0; i < 2**25; i++) {
+    var targetIndex = binarySearch(numArray, target);
+  }
+  endTimeIterative = window.performance.now();
+  
+  //draw_values(numArray, target, target);
+  
   const result = document.getElementById('result');
   console.log(targetIndex);
-  result.innerHTML = targetIndex;
+  result.innerHTML = `${targetIndex}<br>
+  Recursive took ${(endTimeRecursive - startTimeRecursive) / 2**25} ms.<br>
+  Iterative took ${(endTimeIterative - startTimeIterative) / 2**25} ms.<br>
+  Iterative is ${((endTimeRecursive - startTimeRecursive) / 2**25)/((endTimeIterative - startTimeIterative) / 2**25)} times faster.`;
 }
 
 
-
-/* Deze functie ga ik veranderen */
+/* Iteratief */
 
 function binarySearch(numArray, targetnum) {
   var left = 0;
@@ -61,7 +71,7 @@ function binarySearch(numArray, targetnum) {
   while (left <= right) {
     var middle = Math.floor((left + right) / 2);
     var middlenum = numArray[middle]
-    draw_values(numArray, left, right);
+    //draw_values(numArray, left, right);
 
     if (middlenum === targetnum) {
       return middle;
@@ -74,8 +84,21 @@ function binarySearch(numArray, targetnum) {
   }
 }
 
+/* Recursief */
 
-
+function binarySearchRecursive(numArray, target, start = 0, end = numArray.length - 1) {
+  if (start > end) {
+    return -1;
+  }
+  const mid = Math.floor((start + end) / 2);
+  if (numArray[mid] === target) {
+    return mid;
+  }
+  if (numArray[mid] > target) {
+    return binarySearchRecursive(numArray, target, start, mid - 1);
+  }
+  return binarySearchRecursive(numArray, target, mid + 1, end);
+}
 
 
 
