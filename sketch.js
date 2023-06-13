@@ -85,8 +85,8 @@ function start() {
   Iterative took ${avgTimeIterative} ms.<br>
   Uniform took ${avgTimeUniform} ms. <br>
   Iterative is ${avgTimeRecursive / avgTimeIterative} times faster than recursive.<br>
-  Uniform is ${avgTimeIterative / avgTimeUniform} times faster than uniform.<br>
-  Uniform is ${avgTimeRecursive / avgTimeUniform} times faster than uniform.<br>
+  Uniform is ${avgTimeIterative / avgTimeUniform} times faster than Iterative.<br>
+  Uniform is ${avgTimeRecursive / avgTimeUniform} times faster than Recursive.<br>
   ${fastest} is the fastest variant.`;
   
 
